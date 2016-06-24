@@ -138,7 +138,6 @@ module PrettyText
     ctx.eval("Discourse = {};")
     ctx.eval("Discourse.SiteSettings = {};")
     ctx.eval("Discourse.SiteSettings.highlighted_languages = '';")
-    ctx_load(ctx, "#{Rails.root}/app/assets/javascripts/discourse/lib/utilities.js")
     #
 
     ctx_load(ctx, "vendor/assets/javascripts/loader.js")
@@ -156,7 +155,8 @@ module PrettyText
       end
     end
 
-    ctx.eval("PrettyText = require('pretty-text/pretty-text').default;")
+    ctx.eval("__PrettyText = require('pretty-text/pretty-text').default;")
+    ctx.eval("__buildOptions = require('pretty-text/pretty-text').buildOptions;")
     ctx
   end
 
@@ -275,11 +275,10 @@ module PrettyText
       context = v8
       # we need to do this to work in a multi site environment, many sites, many settings
 
-      context_opts = opts || {}
-      context_opts[:sanitize] = true unless context_opts[:sanitize] == false
-
-      context.eval("pt = new PrettyText(#{context_opts.to_json});")
-      context.eval("raw = #{text.inspect};")
+      # context_opts = opts || {}
+      # context_opts[:sanitize] = true unless context_opts[:sanitize] == false
+      context.eval("__prettyOpts = __buildOptions(#{SiteSetting.client_settings_json})")
+      context.eval("__pt = new __PrettyText(__prettyOpts);")
 
       # if Post.white_listed_image_classes.present?
       #   Post.white_listed_image_classes.each do |klass|
@@ -308,7 +307,7 @@ module PrettyText
       # context.eval('opts["getTopicInfo"] = function(i){return helpers.get_topic_info(i)};')
       # context.eval('opts["categoryHashtagLookup"] = function(c){return helpers.category_tag_hashtag_lookup(c);}')
       DiscourseEvent.trigger(:markdown_context, context)
-      baked = context.eval("pt.cook(#{text.inspect})")
+      baked = context.eval("__pt.cook(#{text.inspect})")
     end
 
     if baked.blank? && !(opts || {})[:skip_blank_test]

@@ -1,3 +1,5 @@
+import { escape } from 'pretty-text/sanitizer';
+
 // Support for various code blocks
 const TEXT_CODE_CLASSES = ["text", "pre", "plain"];
 
@@ -58,7 +60,7 @@ export function setup(helper) {
                      / +$/g : /^ +| +$/g;
 
       const contents = node[node.length-1];
-      node[node.length-1] = Discourse.Utilities.escapeExpression(contents.replace(regexp,''));
+      node[node.length-1] = escape(contents.replace(regexp,''));
     }
   });
 }

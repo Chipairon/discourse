@@ -4,6 +4,29 @@ import WhiteLister from 'pretty-text/white-lister';
 
 const identity = value => value;
 
+export function buildOptions(siteSettings) {
+  const features = {
+    table: !!siteSettings.allow_html_tables,
+    emoji: !!siteSettings.enable_emoji,
+    'bold-italics': true,
+    'auto-link': true,
+    'mentions': true,
+    'code': true,
+    'bbcode': true,
+    'quote': true,
+    'html': true,
+    'category-hashtag': true,
+    'onebox': true,
+    'censored': true,
+    'newline': true
+  };
+
+  return {
+    sanitize: true,
+    features
+  };
+}
+
 export default class {
   constructor(opts) {
     opts = opts || {};
